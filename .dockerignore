@@ -1,0 +1,48 @@
+# Go build output
+bin/
+tmp/
+
+# Git metadata
+.git/
+.gitignore
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Sensitive configuration
+*.env
+.env.*
+!.env.example
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+docker-compose*.yaml
+
+# Documentation
+*.md
+README.md
+
+# Claude AI
+.claude/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+*_test.go
+coverage.out
+
+# Vendor
+vendor/
+
+# SSL certificates (managed via volumes)
+certs/
+
+# Scripts
+scripts/

@@ -1,0 +1,58 @@
+# Config file for Air in TOML format
+
+# Working directory
+root = "."
+tmp_dir = "tmp"
+
+[build]
+# Build command for the application
+cmd = "go build -o bin/testers-admin-api main.go"
+# Binary file yields from cmd
+bin = "bin/testers-admin-api"
+# Customize binary with environment variables
+full_bin = "APP_ENV=dev ./bin/testers-admin-api"
+# Watch these filename extensions
+include_ext = ["go", "tpl", "tmpl", "html"]
+# Ignore these filename extensions or directories
+exclude_dir = ["tmp", "vendor", "bin", ".git", ".idea", ".claude", "certs"]
+# Exclude test files
+exclude_regex = ["_test\\.go"]
+# Exclude unchanged files
+exclude_unchanged = true
+# Follow symlink for directories
+follow_symlink = true
+# This log file is placed in your tmp_dir
+log = "air.log"
+# Poll files for changes instead of using fsnotify
+poll = false
+# Poll interval
+poll_interval = 500 # ms
+# Delay to avoid triggering build on rapid file changes
+delay = 1000 # ms
+# Stop running old binary when build errors occur
+stop_on_error = true
+# Send Interrupt signal before killing process
+send_interrupt = false
+# Delay after sending Interrupt signal
+kill_delay = 500 # ms
+
+[log]
+# Show log time
+time = true
+# Only show main log (silences watcher, build, runner)
+main_only = false
+
+[color]
+# Customize each part's color
+main = "magenta"
+watcher = "cyan"
+build = "yellow"
+runner = "green"
+
+[misc]
+# Delete tmp directory on exit
+clean_on_exit = true
+
+[screen]
+clear_on_rebuild = true
+keep_scroll = true

@@ -1,0 +1,21 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# Build artifacts
+bin/
+tmp/
+
+# Air
+air.log
+
+# SSL Certificates (regenerate as needed)
+certs/
+*.key
+*.crt
+*.csr
+*.pem
+
+# Config (may contain sensitive data)
+config/
