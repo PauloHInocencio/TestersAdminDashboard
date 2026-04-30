@@ -60,8 +60,9 @@ services:
       - ./certs/server.crt:/var/lib/postgresql/certs/server.crt:ro
       - ./certs/server.key:/var/lib/postgresql/certs/server.key:ro
       - ./certs/root.crt:/var/lib/postgresql/certs/root.crt:ro
-      # Mount pg_hba.conf to enforce SSL-only connections
-      - ./db/config/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf:ro
+      # Mount initialization script and pg_hba.conf template
+      - ./db/init/01-configure-ssl.sh:/docker-entrypoint-initdb.d/01-configure-ssl.sh:ro
+      - ./db/config/pg_hba.conf:/docker-entrypoint-initdb.d/pg_hba.conf:ro
     networks:
       - testers-admin-network
     healthcheck:

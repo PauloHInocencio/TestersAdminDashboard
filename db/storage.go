@@ -57,10 +57,11 @@ func (s *Storage) MigrateUp() {
 	if err := goose.SetDialect("postgres"); err != nil {
 		log.Fatalf("Error setting goose dialect: %s", err)
 	}
-
+	log.Println("Running database migrations...")
 	if err := goose.Up(s.DB, "migrations"); err != nil {
 		log.Fatalf("Error trying migrate up: %s", err)
 	}
+	log.Println("Migrations completed successfully")
 }
 
 func (s *Storage) MigrateDownToZero() {
@@ -69,8 +70,9 @@ func (s *Storage) MigrateDownToZero() {
 	if err := goose.SetDialect("postgres"); err != nil {
 		log.Fatalf("Error setting goose dialect: %s", err)
 	}
-
+	log.Println("Running database down migrations...")
 	if err := goose.DownTo(s.DB, "migrations", 0); err != nil {
 		log.Fatalf("Error trying migrate down to zero: %s", err)
 	}
+	log.Println("Migrations completed successfully")
 }
