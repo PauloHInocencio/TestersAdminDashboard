@@ -7,8 +7,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -44,32 +42,18 @@ func (q *Queries) CreateSignup(ctx context.Context, arg CreateSignupParams) erro
 }
 
 const findTesterByID = `-- name: FindTesterByID :one
-SELECT id, email, name, platform, status, created_at, approved_at, rejected_at, invited_at
-FROM tester_signups
-WHERE id = $1
+SELECT id, email, name, status, platform, created_at, approved_at, rejected_at, invited_at FROM tester_signups WHERE id = $1
 `
 
-type FindTesterByIDRow struct {
-	ID         uuid.UUID
-	Email      string
-	Name       string
-	Platform   string
-	Status     string
-	CreatedAt  time.Time
-	ApprovedAt sql.NullTime
-	RejectedAt sql.NullTime
-	InvitedAt  sql.NullTime
-}
-
-func (q *Queries) FindTesterByID(ctx context.Context, id uuid.UUID) (FindTesterByIDRow, error) {
+func (q *Queries) FindTesterByID(ctx context.Context, id uuid.UUID) (TesterSignup, error) {
 	row := q.db.QueryRowContext(ctx, findTesterByID, id)
-	var i FindTesterByIDRow
+	var i TesterSignup
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
 		&i.Name,
-		&i.Platform,
 		&i.Status,
+		&i.Platform,
 		&i.CreatedAt,
 		&i.ApprovedAt,
 		&i.RejectedAt,
@@ -79,38 +63,24 @@ func (q *Queries) FindTesterByID(ctx context.Context, id uuid.UUID) (FindTesterB
 }
 
 const listTesters = `-- name: ListTesters :many
-SELECT id, email, name, platform, status, created_at, approved_at, rejected_at, invited_at
-FROM tester_signups
-ORDER BY created_at DESC
+SELECT id, email, name, status, platform, created_at, approved_at, rejected_at, invited_at FROM tester_signups ORDER BY created_at DESC
 `
 
-type ListTestersRow struct {
-	ID         uuid.UUID
-	Email      string
-	Name       string
-	Platform   string
-	Status     string
-	CreatedAt  time.Time
-	ApprovedAt sql.NullTime
-	RejectedAt sql.NullTime
-	InvitedAt  sql.NullTime
-}
-
-func (q *Queries) ListTesters(ctx context.Context) ([]ListTestersRow, error) {
+func (q *Queries) ListTesters(ctx context.Context) ([]TesterSignup, error) {
 	rows, err := q.db.QueryContext(ctx, listTesters)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListTestersRow
+	var items []TesterSignup
 	for rows.Next() {
-		var i ListTestersRow
+		var i TesterSignup
 		if err := rows.Scan(
 			&i.ID,
 			&i.Email,
 			&i.Name,
-			&i.Platform,
 			&i.Status,
+			&i.Platform,
 			&i.CreatedAt,
 			&i.ApprovedAt,
 			&i.RejectedAt,

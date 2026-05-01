@@ -4,14 +4,10 @@ VALUES ($1, $2, $3)
     ON CONFLICT (email) DO NOTHING;
 
 -- name: ListTesters :many
-SELECT id, email, name, platform, status, created_at, approved_at, rejected_at, invited_at
-FROM tester_signups
-ORDER BY created_at DESC;
+SELECT * FROM tester_signups ORDER BY created_at DESC;
 
 -- name: FindTesterByID :one
-SELECT id, email, name, platform, status, created_at, approved_at, rejected_at, invited_at
-FROM tester_signups
-WHERE id = $1;
+SELECT * FROM tester_signups WHERE id = $1;
 
 -- name: ApproveTester :exec
 UPDATE tester_signups
