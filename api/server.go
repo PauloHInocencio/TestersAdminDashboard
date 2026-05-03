@@ -8,6 +8,7 @@ import (
 	"github.com/PauloHInocencio/testers-admin-dashboard/db"
 	"github.com/PauloHInocencio/testers-admin-dashboard/services/admin"
 	"github.com/PauloHInocencio/testers-admin-dashboard/services/tester"
+	"github.com/rs/cors"
 )
 
 type Server struct {
@@ -36,11 +37,19 @@ func (s *Server) Run() error {
 	adminHandler.RegisterRoutes(v1)
 
 	// Attach v1 to main router
-	router.Handle("/api/v1", http.StripPrefix("/api/v1", v1))
+	router.Handle("/api/v1/", http.StripPrefix("/api/v1", v1))
+
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:8081"},
+		AllowedMethods:   []string{"GET", "POST", "DELETE"},
+		AllowCredentials: true,
+	})
+
+	handler := c.Handler(router)
 
 	httpServer := http.Server{
 		Addr:              s.addr,
-		Handler:           router,
+		Handler:           handler,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
