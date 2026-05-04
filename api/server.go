@@ -42,6 +42,7 @@ func (s *Server) Run() error {
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:8081"},
 		AllowedMethods:   []string{"GET", "POST", "DELETE"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization", "Accept"},
 		AllowCredentials: true,
 	})
 
