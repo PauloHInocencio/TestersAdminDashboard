@@ -3,8 +3,8 @@ package middleware
 import (
 	"context"
 	"net/http"
-
-	"github.com/PauloHInocencio/testers-admin-dashboard/services/admin"
+	
+	"github.com/PauloHInocencio/testers-admin-dashboard/services/session"
 	"github.com/PauloHInocencio/testers-admin-dashboard/utils"
 )
 
@@ -12,9 +12,9 @@ type contextKey string
 
 const AdminEmailKey contextKey = "admin_email"
 
-func RequireAdmin(store admin.AdminStore) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func RequireAdmin(store session.SessionStore) func(http.HandlerFunc) http.HandlerFunc {
+	return func(next http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
 			cookie, err := r.Cookie("admin_session")
 			if err != nil || cookie.Value == "" {
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -29,7 +29,7 @@ func RequireAdmin(store admin.AdminStore) func(http.Handler) http.Handler {
 			}
 
 			ctx := context.WithValue(r.Context(), AdminEmailKey, email)
-			next.ServeHTTP(w, r.WithContext(ctx))
-		})
+			next(w, r.WithContext(ctx))
+		}
 	}
 }

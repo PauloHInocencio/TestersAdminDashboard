@@ -1,12 +1,11 @@
 package email
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"net/http"
 	"os"
+
+	"github.com/resend/resend-go/v3"
 )
 
 type EmailService interface {
@@ -16,80 +15,53 @@ type EmailService interface {
 }
 
 type Service struct {
-	ApiKey    string
+	Client    *resend.Client
 	FromEmail string
-	Client    *http.Client
 }
 
 func NewService() *Service {
+	apiKey := os.Getenv("RESEND_API_KEY")
 	return &Service{
-		ApiKey:    os.Getenv("RESEND_API_KEY"),
+		Client:    resend.NewClient(apiKey),
 		FromEmail: os.Getenv("FROM_EMAIL"),
-		Client:    &http.Client{},
 	}
 }
 
 func (s *Service) SendMagicLink(ctx context.Context, to string, link string) error {
-	payload := map[string]any{
-		"from":    s.FromEmail,
-		"to":      []string{to},
-		"subject": "Your ThePrice admin access link",
-		"html":    buildMagicLinkHTML(link),
+	params := &resend.SendEmailRequest{
+		From:    s.FromEmail,
+		To:      []string{to},
+		Subject: "Tester admin dashboard Access link",
+		Html:    buildMagicLinkHTML(link),
 	}
-	return s.send(ctx, payload)
+	return s.send(ctx, params)
 }
 
 func (s *Service) SendAndroidInvite(ctx context.Context, to string, playStoreLink string) error {
-	payload := map[string]any{
-		"from":    s.FromEmail,
-		"to":      []string{to},
-		"subject": "You've been approved to test ThePrice on Android",
-		"html":    buildAndroidInviteHTML(playStoreLink),
+	params := &resend.SendEmailRequest{
+		From:    s.FromEmail,
+		To:      []string{to},
+		Subject: "You've been approved to test ThePrice on Android",
+		Html:    buildAndroidInviteHTML(playStoreLink),
 	}
-	return s.send(ctx, payload)
+	return s.send(ctx, params)
 }
 
 func (s *Service) SendIOSInvite(ctx context.Context, to string, testFlightLink string) error {
-	payload := map[string]any{
-		"from":    s.FromEmail,
-		"to":      []string{to},
-		"subject": "You've been approved to test ThePrice on iOS",
-		"html":    buildIOSInviteHTML(testFlightLink),
+	params := &resend.SendEmailRequest{
+		From:    s.FromEmail,
+		To:      []string{to},
+		Subject: "You've been approved to test ThePrice on iOS",
+		Html:    buildIOSInviteHTML(testFlightLink),
 	}
-
-	return s.send(ctx, payload)
+	return s.send(ctx, params)
 }
 
-func (s *Service) send(ctx context.Context, payload map[string]any) error {
-	body, err := json.Marshal(payload)
+func (s *Service) send(ctx context.Context, params *resend.SendEmailRequest) error {
+	_, err := s.Client.Emails.SendWithContext(ctx, params)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to email to %s: %w", params.To, err)
 	}
-
-	req, err := http.NewRequestWithContext(
-		ctx,
-		http.MethodPost,
-		"https://api.resend.com/emails",
-		bytes.NewBuffer(body),
-	)
-
-	if err != nil {
-		return nil
-	}
-
-	req.Header.Set("Authorization", "Bearer "+s.ApiKey)
-	req.Header.Set("Content-Type", "application/json")
-
-	res, err := s.Client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode >= 300 {
-		return fmt.Errorf("resend email failed with status %d", res.StatusCode)
-	}
-
 	return nil
 }
 
@@ -101,14 +73,14 @@ func buildMagicLinkHTML(link string) string {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; justify-content: center; align-items: center;">
     <div style="background-color: #f4f4f4; padding: 20px; border-radius: 5px;">
         <h2 style="color: #2c3e50;">ThePrice Admin Access</h2>
         <p>Click the link below to access your admin dashboard:</p>
         <p style="margin: 30px 0;">
-            <a href="%%s" style="display: inline-block; padding: 12px 30px; background-color: #3498db; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold;">Login to ThePrice Admin</a>
+            <a href="%s" style="display: inline-block; padding: 12px 30px; background-color: #3498db; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold;">Login to ThePrice Admin</a>
         </p>
-        <p style="color: #e74c3c; font-weight: bold;">This link expires in 15 minutes.</p>
+        <p style="color: #e74c3c; font-weight: bold;">This link expires in 2 minutes.</p>
         <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
         <p style="font-size: 12px; color: #7f8c8d;">
             If you didn't request this link, please ignore this email.
@@ -141,7 +113,7 @@ func buildAndroidInviteHTML(playLink string) string {
         </ol>
 
         <p style="margin: 30px 0;">
-            <a href="%%s" style="display: inline-block; padding: 12px 30px; background-color: #27ae60; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold;">Join Android Beta Test</a>
+            <a href="%s" style="display: inline-block; padding: 12px 30px; background-color: #27ae60; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold;">Join Android Beta Test</a>
         </p>
 
         <div style="background-color: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
@@ -186,7 +158,7 @@ func buildIOSInviteHTML(testFlightLink string) string {
         </ol>
 
         <p style="margin: 30px 0;">
-            <a href="%%s" style="display: inline-block; padding: 12px 30px; background-color: #5856d6; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold;">Join iOS Beta Test</a>
+            <a href="%s" style="display: inline-block; padding: 12px 30px; background-color: #5856d6; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold;">Join iOS Beta Test</a>
         </p>
 
         <div style="background-color: #e3f2fd; padding: 15px; border-left: 4px solid #2196f3; margin: 20px 0;">

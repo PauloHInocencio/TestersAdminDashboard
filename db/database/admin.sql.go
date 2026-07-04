@@ -66,6 +66,15 @@ func (q *Queries) DeleteSession(ctx context.Context, tokenHash string) error {
 	return err
 }
 
+const deleteTester = `-- name: DeleteTester :exec
+DELETE FROM tester_signups WHERE id = $1
+`
+
+func (q *Queries) DeleteTester(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteTester, id)
+	return err
+}
+
 const findValidMagicLinkForUpdate = `-- name: FindValidMagicLinkForUpdate :one
 SELECT email
 FROM magic_links

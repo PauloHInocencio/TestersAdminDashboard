@@ -27,7 +27,8 @@ func (q *Queries) ApproveTester(ctx context.Context, id uuid.UUID) error {
 const createSignup = `-- name: CreateSignup :exec
 INSERT INTO tester_signups (email, name, platform)
 VALUES ($1, $2, $3)
-    ON CONFLICT (email) DO NOTHING
+ON CONFLICT (email)
+DO UPDATE SET name = $2, platform = $3
 `
 
 type CreateSignupParams struct {

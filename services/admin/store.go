@@ -26,7 +26,6 @@ type AdminStore interface {
 	CreateMagicLink(ctx context.Context, params AdminAuthParams) error
 	ConsumeMagicLink(ctx context.Context, tokenHash string) (string, error)
 	CreateAdminSession(ctx context.Context, params AdminAuthParams) error
-	FindValidSession(ctx context.Context, tokenHash string) (string, error)
 	DeleteSession(ctx context.Context, tokenHash string) error
 }
 
@@ -85,9 +84,6 @@ func (s *Store) CreateAdminSession(ctx context.Context, params AdminAuthParams) 
 	})
 }
 
-func (s *Store) FindValidSession(ctx context.Context, tokenHash string) (string, error) {
-	return s.queries.FindValidSession(ctx, tokenHash)
-}
 func (s *Store) DeleteSession(ctx context.Context, tokenHash string) error {
 	return s.queries.DeleteSession(ctx, tokenHash)
 }

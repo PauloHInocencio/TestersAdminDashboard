@@ -6,6 +6,7 @@ import (
 	"net/mail"
 	"strings"
 
+	"github.com/PauloHInocencio/testers-admin-dashboard/middleware"
 	"github.com/PauloHInocencio/testers-admin-dashboard/models"
 	"github.com/PauloHInocencio/testers-admin-dashboard/utils"
 )
@@ -21,14 +22,15 @@ func NewHandler(store TestersStore) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(router *http.ServeMux) {
-	router.HandleFunc("POST /testers/signup", h.signupTester)
+	logging := middleware.GetLoggingMiddleware()
+	router.HandleFunc("POST /testers/signup", logging(h.signupTester))
 }
 
 func (h *Handler) signupTester(w http.ResponseWriter, r *http.Request) {
 	var req models.TesterSignupRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		utils.JSON(w, http.StatusBadRequest, models.TesterSignupResponse{
+		utils.JSON(w, http.StatusBadRequest, models.ApiResponse{
 			Success: false,
 			Message: "Invalid request",
 		})
@@ -37,7 +39,7 @@ func (h *Handler) signupTester(w http.ResponseWriter, r *http.Request) {
 
 	email := strings.ToLower(strings.TrimSpace(req.Email))
 	if _, err := mail.ParseAddress(email); err != nil {
-		utils.JSON(w, http.StatusBadRequest, models.TesterSignupResponse{
+		utils.JSON(w, http.StatusBadRequest, models.ApiResponse{
 			Success: false,
 			Message: "Invalid email address",
 		})
@@ -46,16 +48,16 @@ func (h *Handler) signupTester(w http.ResponseWriter, r *http.Request) {
 
 	name := strings.TrimSpace(req.Name)
 	if name == "" {
-		utils.JSON(w, http.StatusBadRequest, models.TesterSignupResponse{
+		utils.JSON(w, http.StatusBadRequest, models.ApiResponse{
 			Success: false,
 			Message: "Name is required",
 		})
 	}
-	
+
 	validPlatforms := map[string]bool{"android": true, "ios": true, "both": true}
 	platform := strings.ToLower(strings.TrimSpace(req.Platform))
 	if !validPlatforms[platform] {
-		utils.JSON(w, http.StatusBadRequest, models.TesterSignupResponse{
+		utils.JSON(w, http.StatusBadRequest, models.ApiResponse{
 			Success: false,
 			Message: "Invalid platform. Must be: android, ios, or both",
 		})
@@ -63,13 +65,13 @@ func (h *Handler) signupTester(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.store.CreateSignup(r.Context(), email, name, platform); err != nil {
-		utils.JSON(w, http.StatusInternalServerError, models.TesterSignupResponse{
+		utils.JSON(w, http.StatusInternalServerError, models.ApiResponse{
 			Success: false,
 			Message: "Failed to create signup",
 		})
 	}
 
-	utils.JSON(w, http.StatusOK, models.TesterSignupResponse{
+	utils.JSON(w, http.StatusOK, models.ApiResponse{
 		Success: true,
 		Message: "Thanks! You've been added to the tester waitlist.",
 	})

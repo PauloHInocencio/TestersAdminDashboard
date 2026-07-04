@@ -1,7 +1,8 @@
 -- name: CreateSignup :exec
 INSERT INTO tester_signups (email, name, platform)
 VALUES ($1, $2, $3)
-    ON CONFLICT (email) DO NOTHING;
+ON CONFLICT (email)
+DO UPDATE SET name = $2, platform = $3;
 
 -- name: ListTesters :many
 SELECT * FROM tester_signups ORDER BY created_at DESC;

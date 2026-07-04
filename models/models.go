@@ -8,10 +8,10 @@ type TesterSignup struct {
 	Name       string     `json:"name"`
 	Platform   string     `json:"platform"`
 	Status     string     `json:"status"`
-	CreatedAt  time.Time  `json:"createdAt,omitempty"`
-	ApprovedAt *time.Time `json:"approvedAt,omitempty"`
-	RejectedAt *time.Time `json:"rejectedAt,omitempty"`
-	InvitedAt  *time.Time `json:"invitedAt,omitempty"`
+	CreatedAt  time.Time  `json:"createdAt"`
+	ApprovedAt *time.Time `json:"approvedAt"`
+	RejectedAt *time.Time `json:"rejectedAt"`
+	InvitedAt  *time.Time `json:"invitedAt"`
 }
 
 type TesterSignupRequest struct {
@@ -20,9 +20,13 @@ type TesterSignupRequest struct {
 	Platform string `json:"platform"`
 }
 
-type TesterSignupResponse struct {
+type ApiResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message,omitempty"`
+}
+
+type ListOfTestersResponse struct {
+	Data []TesterSignup `json:"data"`
 }
 
 type RequestMagicLinkRequest struct {

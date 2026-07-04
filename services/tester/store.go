@@ -19,6 +19,7 @@ type TestersStore interface {
 	Approve(ctx context.Context, id uuid.UUID) error
 	Reject(ctx context.Context, id uuid.UUID) error
 	MarkAsInvited(ctx context.Context, id uuid.UUID) error
+	Delete(ctx context.Context, id uuid.UUID) error
 }
 
 func NewStore(queries *database.Queries) *Store {
@@ -64,6 +65,10 @@ func (s *Store) Reject(ctx context.Context, id uuid.UUID) error {
 
 func (s *Store) MarkAsInvited(ctx context.Context, id uuid.UUID) error {
 	return s.queries.MarkTesterInvited(ctx, id)
+}
+
+func (s *Store) Delete(ctx context.Context, id uuid.UUID) error {
+	return s.queries.DeleteTester(ctx, id)
 }
 
 func toModel(row database.TesterSignup) models.TesterSignup {

@@ -33,3 +33,6 @@ WHERE token_hash = $1
 -- name: DeleteSession :exec
 DELETE FROM admin_sessions
 WHERE token_hash = $1;
+
+-- name: DeleteTester :exec
+DELETE FROM tester_signups WHERE id = $1;

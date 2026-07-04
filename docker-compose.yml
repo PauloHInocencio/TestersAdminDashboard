@@ -13,6 +13,11 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_HOST: ${DB_HOST}
       DB_SSLMODE: ${DB_SSLMODE:-require}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      FROM_EMAIL: ${FROM_EMAIL}
+      WEB_BASE_URL: ${WEB_BASE_URL}
+      ANDROID_INVITE_LINK: ${ANDROID_INVITE_LINK}
+      IOS_INVITE_LINK: ${IOS_INVITE_LINK}
     env_file:
       - ./.env
     depends_on:
