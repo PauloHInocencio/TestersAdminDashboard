@@ -9,13 +9,13 @@ A secure Go backend API for managing beta tester signups with passwordless magic
 - **Session-Based Security** - Secure, time-limited sessions with HttpOnly cookies
 - **Email Integration** - Automated magic link and beta invite emails via Resend
 - **Type-Safe Database** - SQLC-generated type-safe database queries
-- **Containerized Development** - Full Docker Compose setup with PostgreSQL SSL/TLS
+- **Containerized Development** - Full Docker Compose setup with PostgreSQL
 - **Request Logging** - Built-in middleware for request/response tracking
 
 ## Tech Stack
 
 - **Backend**: Go 1.25.9
-- **Database**: PostgreSQL 17 (Alpine) with SSL/TLS
+- **Database**: PostgreSQL 17 (Alpine)
 - **SQL Tooling**: SQLC (type-safe queries) + Goose (migrations)
 - **Email Service**: Resend
 - **Development**: Docker Compose, Air (hot reload)
@@ -64,15 +64,7 @@ IOS_INVITE_LINK=https://testflight.apple.com/join/YOUR_CODE
 DB_PASSWORD=your_secure_password_here
 ```
 
-### 3. Generate SSL Certificates (PostgreSQL)
-
-```bash
-make ssl-certs
-# OR
-bash scripts/generate-ssl-certs.sh
-```
-
-### 4. Start the Application
+### 3. Start the Application
 
 ```bash
 make run
@@ -82,7 +74,7 @@ docker-compose up --build
 
 The API will be available at `http://localhost:8080`
 
-### 5. Add Your First Admin User
+### 4. Add Your First Admin User
 
 After the database migrations run, add your admin email to the whitelist:
 
@@ -162,11 +154,11 @@ docker exec -it postgres17-testers psql -U postgres -d testers_admin
 
 # Run migrations manually
 docker exec -it testers-admin-api goose -dir db/migrations postgres \
-  "postgres://postgres:yourpass@db:5432/testers_admin?sslmode=require" up
+  "postgres://postgres:yourpass@db:5432/testers_admin?sslmode=disable" up
 
 # Check migration status
 docker exec -it testers-admin-api goose -dir db/migrations postgres \
-  "postgres://postgres:yourpass@db:5432/testers_admin?sslmode=require" status
+  "postgres://postgres:yourpass@db:5432/testers_admin?sslmode=disable" status
 ```
 
 ### Regenerate Database Code (After Modifying SQL)
@@ -204,7 +196,6 @@ sqlc generate
 | `DB_USER` | Database user | `postgres` |
 | `DB_PASSWORD` | Database password | `your_secure_password` |
 | `DB_HOST` | Database host | `postgres17-testers` |
-| `DB_SSLMODE` | SSL mode for PostgreSQL | `require` |
 | `RESEND_API_KEY` | Resend API key | `re_xxxxx` |
 | `FROM_EMAIL` | Email sender address | `"App <noreply@domain.com>"` |
 | `WEB_BASE_URL` | Backend base URL | `http://localhost:8080` |
@@ -225,7 +216,6 @@ sqlc generate
 - [ ] Rotate database password from example defaults
 - [ ] Verify Resend API key and FROM_EMAIL domain
 - [ ] Add production admin email(s) to whitelist
-- [ ] Generate fresh SSL certificates for PostgreSQL
 - [ ] Review session expiry time (default: 1 hour)
 - [ ] Configure proper logging and monitoring
 
@@ -234,7 +224,6 @@ sqlc generate
 ```bash
 # Production .env
 PORT=8080
-DB_SSLMODE=require
 RESEND_API_KEY=re_live_xxxxx
 FROM_EMAIL="ThePrice <noreply@theprice.app>"
 WEB_BASE_URL=https://api.theprice.app
@@ -284,7 +273,6 @@ Additional documentation can be found in the `docs/` directory:
 - `session-authentication-explained.md` - Security analysis of auth flow
 - `cors-explained.md` - CORS configuration details
 - `docker-compose-explained.md` - Development environment setup
-- `SSL_CERTIFICATES_EXPLAINED.md` - SSL/TLS setup guide
 
 For Claude Code users, see `CLAUDE.md` for AI-assisted development guidance.
 

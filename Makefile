@@ -1,7 +1,3 @@
-ssl-certs:
-	@echo "Generating SSL certificates..."
-	@bash scripts/generate-ssl-certs.sh
-
 build:
 	@docker compose build
 

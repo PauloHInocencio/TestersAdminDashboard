@@ -10,19 +10,13 @@ import (
 )
 
 func main() {
-	// Get SSL mode from environment (default to require)
-	sslMode := os.Getenv("DB_SSLMODE")
-
 	dbUrl := fmt.Sprintf(
-		"postgres://%s:%s@%s:5432/%s?sslmode=%s&sslrootcert=/app/certs/root.crt",
+		"postgres://%s:%s@%s:5432/%s?sslmode=disable",
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_NAME"),
-		sslMode,
 	)
-
-	log.Printf("Connection to database with SSL mode: %s", sslMode)
 
 	storage := db.NewStorage(dbUrl)
 	storage.MigrateUp()

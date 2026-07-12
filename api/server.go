@@ -51,7 +51,7 @@ func (s *Server) Run() error {
 	if len(allowedOrigins) == 0 || allowedOrigins[0] == "" {
 		allowedOrigins = []string{"http://localhost:8081"}
 	}
-	fmt.Printf("Allowed origins: %v", allowedOrigins)
+	fmt.Printf("Allowed origins: %v\n", allowedOrigins)
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   allowedOrigins,

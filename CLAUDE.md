@@ -8,7 +8,7 @@ ThePrice Testers Admin Dashboard - A Go backend API for managing beta tester sig
 
 **Tech Stack:**
 - Go 1.25.9
-- PostgreSQL 17 (Alpine) with SSL/TLS
+- PostgreSQL 17 (Alpine)
 - SQLC for type-safe SQL queries
 - Goose for database migrations
 - Resend for email delivery
@@ -59,7 +59,7 @@ PORT=8080 DB_HOST=localhost go run main.go
 docker exec -it postgres17-testers psql -U postgres -d testers_admin
 
 # Run migrations manually
-docker exec -it testers-admin-api goose -dir db/migrations postgres "postgres://user:pass@db:5432/testers_admin?sslmode=require" up
+docker exec -it testers-admin-api goose -dir db/migrations postgres "postgres://user:pass@db:5432/testers_admin?sslmode=disable" up
 
 # Rollback migration
 docker exec -it testers-admin-api goose -dir db/migrations postgres "connection-string" down
@@ -92,15 +92,6 @@ sqlc generate
 ```
 
 This regenerates `db/database/*.go` files with type-safe Go code.
-
-### SSL Certificates
-
-```bash
-# Generate SSL certificates for PostgreSQL
-make ssl-certs
-# OR
-bash scripts/generate-ssl-certs.sh
-```
 
 ## Architecture
 
@@ -267,7 +258,6 @@ DB_NAME=testers_admin
 DB_USER=postgres
 DB_PASSWORD=your_secure_password_here
 DB_HOST=postgres17-testers
-DB_SSLMODE=require
 
 # Email Service
 RESEND_API_KEY=re_your_api_key_here
@@ -378,7 +368,6 @@ See `docs/session-authentication-explained.md` for security analysis.
 
 **HTTPS Requirements**:
 - `Secure: true` cookie flag requires HTTPS in production
-- PostgreSQL SSL/TLS enabled by default (see `docker-compose.yml`)
 
 **Production Checklist**:
 - [ ] Set `COOKIE_SECURE=true` for HTTPS environments
@@ -411,7 +400,6 @@ See `docs/session-authentication-explained.md` for security analysis.
 │   ├── session/          # Session validation
 │   └── tester/           # Tester signups
 ├── utils/                 # Token generation, hashing
-├── certs/                 # SSL certificates (PostgreSQL)
 ├── docker-compose.yml     # Development environment
 ├── Dockerfile             # Multi-stage build (dev + prod)
 ├── .air.toml             # Hot-reload configuration
@@ -429,7 +417,6 @@ See `docs/session-authentication-explained.md` for security analysis.
 ### Infrastructure Documentation
 - `docs/docker-compose-explained.md` - Development environment setup
 - `docs/dockerfile-security-explained.md` - Docker security patterns
-- `docs/SSL_CERTIFICATES_EXPLAINED.md` - SSL/TLS setup guide
 - `docs/pg_hba_conf_explained.md` - PostgreSQL authentication config
 - `docs/db-init-script-explained.md` - Database initialization
 

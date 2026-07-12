@@ -17,9 +17,6 @@ FROM build-base AS development
 # Install the air CLI for auto-reloading
 RUN go install github.com/air-verse/air@v1.61.7
 
-# Create directory for SSL certificates
-RUN mkdir -p /app/certs
-
 # Start air for live reloading
 CMD ["air", "-c", ".air.toml"]
 
@@ -46,9 +43,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 
 # Create non-root user for security
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
-
-# Create directory for SSL certificates
-RUN mkdir -p /app/certs && chown appuser:appuser /app/certs
 
 # Copy binary from builder stage
 COPY --from=build-prod /app/bin/testers-admin-api ./testers-admin-api
