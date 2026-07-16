@@ -26,7 +26,7 @@ jobs:
           context: .
           target: deploy
           push: true
-          tags: paulohinocencio/testers-admin-api:latest
+          tags: hinocencio/testers-admin-api:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
