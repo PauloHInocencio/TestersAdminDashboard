@@ -24,9 +24,10 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./Dockerfile
           target: deploy
           push: true
-          tags: hinocencio/testers-admin-api:latest
+          tags: hinocenciopaulo/testers-admin-api:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
